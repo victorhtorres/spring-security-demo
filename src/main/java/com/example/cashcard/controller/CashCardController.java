@@ -4,10 +4,13 @@ import com.example.cashcard.repository.CashCardRepository;
 import com.example.cashcard.entity.CashCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The cash card REST API
@@ -41,7 +44,13 @@ public class CashCardController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<CashCard>> findAll() {
-        return ResponseEntity.ok(this.cashCardRepository.findAll());
+    public ResponseEntity<Iterable<CashCard>> findAll(Authentication authentication) {
+        List<CashCard> filtered = new ArrayList<>();
+        this.cashCardRepository.findAll().forEach(cashCard -> {
+            if (cashCard.getOwner().equals(authentication.getName())) {
+                filtered.add(cashCard);
+            }
+        });
+        return ResponseEntity.ok(filtered);
     }
 }
