@@ -1,10 +1,10 @@
 package com.example.cashcard.controller;
 
+import com.example.cashcard.meta.CurrentOwner;
 import com.example.cashcard.repository.CashCardRepository;
 import com.example.cashcard.entity.CashCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -43,8 +43,7 @@ public class CashCardController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<CashCard>> findAll(
-        @CurrentSecurityContext(expression = "authentication.name") String owner) {
+    public ResponseEntity<Iterable<CashCard>> findAll(@CurrentOwner String owner) {
         List<CashCard> result = cashCardRepository.findByOwner(owner);
         return ResponseEntity.ok(result);
     }
