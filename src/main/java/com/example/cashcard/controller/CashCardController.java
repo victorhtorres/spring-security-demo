@@ -45,12 +45,7 @@ public class CashCardController {
 
     @GetMapping
     public ResponseEntity<Iterable<CashCard>> findAll(Authentication authentication) {
-        List<CashCard> filtered = new ArrayList<>();
-        this.cashCardRepository.findAll().forEach(cashCard -> {
-            if (cashCard.getOwner().equals(authentication.getName())) {
-                filtered.add(cashCard);
-            }
-        });
-        return ResponseEntity.ok(filtered);
+        List<CashCard> result = cashCardRepository.findByOwner(authentication.getName());
+        return ResponseEntity.ok(result);
     }
 }
