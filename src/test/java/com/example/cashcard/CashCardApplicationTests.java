@@ -42,8 +42,7 @@ class CashCardApplicationTests {
 						.contentType("application/json")
 						.content("""
                         {
-                            "amount" : 250.00,
-                            "owner"  : "sarah1"
+                            "amount" : 250.00
                         }
                         """))
 				.andExpect(status().isCreated())

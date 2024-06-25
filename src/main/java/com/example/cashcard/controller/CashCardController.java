@@ -1,6 +1,7 @@
 package com.example.cashcard.controller;
 
 import com.example.cashcard.meta.CurrentOwner;
+import com.example.cashcard.payload.CashCardRequest;
 import com.example.cashcard.repository.CashCardRepository;
 import com.example.cashcard.entity.CashCard;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +34,16 @@ public class CashCardController {
     }
 
     @PostMapping
-    private ResponseEntity<CashCard> createCashCard(@RequestBody CashCard newCashCardRequest, UriComponentsBuilder ucb) {
-        CashCard savedCashCard = cashCardRepository.save(newCashCardRequest);
+    private ResponseEntity<CashCard> createCashCard(@RequestBody CashCardRequest newCashCardRequest, UriComponentsBuilder ucb,
+                                                    @CurrentOwner String owner) {
+
+        CashCard savedCashCard = new CashCard(newCashCardRequest.getAmount(), owner);
+        CashCard savedCashCardSaved = cashCardRepository.save(savedCashCard);
         URI locationOfNewCashCard = ucb
                 .path("cashcards/{id}")
-                .buildAndExpand(savedCashCard.getId())
+                .buildAndExpand(savedCashCardSaved.getId())
                 .toUri();
-        return ResponseEntity.created(locationOfNewCashCard).body(savedCashCard);
+        return ResponseEntity.created(locationOfNewCashCard).body(savedCashCardSaved);
     }
 
     @GetMapping
