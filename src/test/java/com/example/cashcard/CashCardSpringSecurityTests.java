@@ -24,10 +24,13 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CashCardSpringSecurityTests {
@@ -63,6 +66,20 @@ public class CashCardSpringSecurityTests {
         this.mvc.perform(get("/cashcards/100").header("Authorization", "Bearer " + token))
             .andExpect(status().isUnauthorized())
             .andExpect(header().string("WWW-Authenticate", containsString("Jwt expired")));
+    }
+
+    @Test
+    void shouldShowAllTokenValidationErrors() throws Exception {
+        String expired = mint((claims) -> claims
+            .audience(List.of("https://wrong"))
+            .issuedAt(Instant.now().minusSeconds(3600))
+            .expiresAt(Instant.now().minusSeconds(3599))
+        );
+        this.mvc.perform(get("/cashcards").header("Authorization", "Bearer " + expired))
+            .andExpect(status().isUnauthorized())
+            .andExpect(header().exists("WWW-Authenticate"))
+            .andExpect(jsonPath("$.errors..description").value(
+                containsInAnyOrder(containsString("Jwt expired"), containsString("aud claim is not valid"))));
     }
 
     private String mint() {
