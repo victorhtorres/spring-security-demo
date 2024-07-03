@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser(username = "sarah1")
+@WithMockUser(username = "sarah1", authorities = {"SCOPE_cashcard:read"})
 class CashCardApplicationTests {
 
 	@Autowired
@@ -33,6 +33,7 @@ class CashCardApplicationTests {
 				.andExpect(jsonPath("$.owner").value("sarah1"));
 	}
 
+	@WithMockUser(username="esuez5", authorities = {"SCOPE_cashcard:read", "SCOPE_cashcard:write"})
 	@Test
 	@DirtiesContext
 	void shouldCreateANewCashCard() throws Exception {
@@ -51,7 +52,7 @@ class CashCardApplicationTests {
 		this.mvc.perform(get(location))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.amount").value(250.00))
-				.andExpect(jsonPath("$.owner").value("sarah1"));
+				.andExpect(jsonPath("$.owner").value("esuez5"));
 	}
 
 	@Test
