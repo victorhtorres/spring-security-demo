@@ -36,7 +36,7 @@ public class CashCardController {
     }
 
     @PostMapping
-    private ResponseEntity<CashCard> createCashCard(@RequestBody CashCardRequest newCashCardRequest, UriComponentsBuilder ucb,
+    public ResponseEntity<CashCard> createCashCard(@RequestBody CashCardRequest newCashCardRequest, UriComponentsBuilder ucb,
                                                     @CurrentOwner String owner) {
 
         CashCard savedCashCard = new CashCard(newCashCardRequest.getAmount(), owner);
